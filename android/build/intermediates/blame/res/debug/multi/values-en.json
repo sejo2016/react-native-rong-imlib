@@ -1,0 +1,102 @@
+[
+    {
+        "outputFile": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest/node_modules/react-native-rong-imlib/android/build/intermediates/incremental/mergeDebugResources/merged.dir/values-en/values-en.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 72,
+                    "endOffset": 123
+                },
+                "from": {
+                    "file": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest/node_modules/react-native-rong-imlib/android/src/main/res/values-en/rc_strings.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 132,
+                        "endColumn": 72,
+                        "endOffset": 200
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 128,
+                    "endColumn": 75,
+                    "endOffset": 199
+                },
+                "from": {
+                    "file": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest/node_modules/react-native-rong-imlib/android/src/main/res/values-en/rc_strings.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 286,
+                        "endColumn": 90,
+                        "endOffset": 372
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 204,
+                    "endColumn": 91,
+                    "endOffset": 291
+                },
+                "from": {
+                    "file": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest/node_modules/react-native-rong-imlib/android/src/main/res/values-en/rc_strings.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 377,
+                        "endColumn": 111,
+                        "endOffset": 484
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 296,
+                    "endColumn": 78,
+                    "endOffset": 370
+                },
+                "from": {
+                    "file": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest/node_modules/react-native-rong-imlib/android/src/main/res/values-en/rc_strings.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 206,
+                        "endColumn": 78,
+                        "endOffset": 280
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 375,
+                    "endColumn": 75,
+                    "endOffset": 446
+                },
+                "from": {
+                    "file": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest/node_modules/react-native-rong-imlib/android/src/main/res/values-en/rc_strings.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 56,
+                        "endColumn": 75,
+                        "endOffset": 127
+                    }
+                }
+            }
+        ]
+    }
+]

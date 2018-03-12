@@ -1,0 +1,59 @@
+{
+  "_from": "git://github.com/sejo2016/react-native-rong-imlib.git",
+  "_id": "react-native-rong-imlib@0.1.7",
+  "_inBundle": false,
+  "_location": "/react-native-rong-imlib",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "react-native-rong-imlib@git://github.com/sejo2016/react-native-rong-imlib.git",
+    "name": "react-native-rong-imlib",
+    "escapedName": "react-native-rong-imlib",
+    "rawSpec": "git://github.com/sejo2016/react-native-rong-imlib.git",
+    "saveSpec": "git://github.com/sejo2016/react-native-rong-imlib.git",
+    "fetchSpec": "git://github.com/sejo2016/react-native-rong-imlib.git",
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git://github.com/sejo2016/react-native-rong-imlib.git#d4f7b7fe7e444e91f92c36037703df6cc8ee53f6",
+  "_spec": "react-native-rong-imlib@git://github.com/sejo2016/react-native-rong-imlib.git",
+  "_where": "/Users/toumurasaki/Documents/workspace/react_native/RongIMTest",
+  "author": {
+    "name": "reactnativecn"
+  },
+  "bugs": {
+    "url": "https://github.com/reactnativecn/react-native-rong-imlib/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "fbemitter": "^2.0.2"
+  },
+  "deprecated": false,
+  "description": "React Native下的融云SDK (IMLib) 封装",
+  "homepage": "https://github.com/reactnativecn/react-native-rong-imlib#readme",
+  "keywords": [
+    "react",
+    "native",
+    "ios",
+    "android",
+    "rong",
+    "im",
+    "chat"
+  ],
+  "license": "ISC",
+  "main": "src/index.js",
+  "name": "react-native-rong-imlib",
+  "peerDependencies": {
+    "react-native": ">=0.18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reactnativecn/react-native-rong-imlib.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.1.7"
+}
