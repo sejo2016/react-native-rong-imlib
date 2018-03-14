@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.common.executors.UiThreadImmediateExecutorService;
@@ -18,7 +19,9 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
@@ -28,7 +31,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -100,6 +107,7 @@ public class Utils {
         }
         return ret;
     }
+
 
     public static WritableArray convertConversationList(List<Conversation> conversations) {
         WritableArray ret = Arguments.createArray();
@@ -228,5 +236,29 @@ public class Utils {
         ImageMessage imgMsg = ImageMessage.obtain(Uri.fromFile(imageFileThumb), Uri.fromFile(imageFileSource));
 
         return imgMsg;
+    }
+
+    public static int[] convertToIntArray(ReadableArray readableArray){
+        int[] array = new int[readableArray.size()];
+
+        for(int i=0;i<readableArray.size();i++){
+            if(!ReadableType.Number.equals(readableArray.getType(i))){
+                throw new IllegalArgumentException("Excepting an array of num");
+            }
+            array[i] = readableArray.getInt(i);
+        }
+        return array;
+    }
+
+    public static List<String> converToStringList(ReadableArray readableArray){
+        List<String> list = new ArrayList<String>();
+
+        for(int i=0;i<readableArray.size();i++){
+            if(!ReadableType.Number.equals(readableArray.getType(i))){
+                throw new IllegalArgumentException("Excepting an array of num");
+            }
+            list.set(i, readableArray.getString(i));
+        }
+        return list;
     }
 }
