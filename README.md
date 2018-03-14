@@ -59,37 +59,44 @@ message = {
 }
 ```
 
-###### 4. getConversation(string type,string targetId)
-###### 5. getConversationList()
-###### 6. getLatestMessages(string type,string targetId,number count)
-###### 7. removeConversation(string type,string targetId)
-###### 8. insertMessage(string type,string targetId,string senderId,object content)
-###### 9. clearMessageUnreadStatus(string type,string targetId)
-###### 10. startRecordVoice()
-###### 11. cancelRecordVoice()
-###### 12. finishRecordVoice()
-###### 13. startPlayVoice()
-###### 14. stopPlayVoice()
-###### 15. getConversationNotificationStatus(string type,string targetId)
-###### 16. setConversationNotificationStatus(string type,string targetId,boolean isBlock)
-###### 17. clearMessages(string type,string targetId)
-###### 18. deleteMessagesByTarget(string type,string targetId)
-###### 19. deleteMessagesByMsgIds(array targetIds)
-###### 20. getRemoteHistoryMessages(string type,string targetId,number dateTime,number count)
-###### 21. saveTextMessageDraft(string type,string targetId,string content)
-###### 22. getTextMessageDraft(string type,string targetId)
-###### 23. addToBlacklist(string userId)
-###### 24. removeFromBlacklist(string userId)
-###### 25. getBlacklist()
-###### 26. createDiscussion(string name,array userIdLists)
-###### 27. addMemberToDiscussion(string discussionId,array userIdList)
-###### 28. removeMemberFromDiscussion(string discussionId,string userId)
-###### 29. quitDiscussion(string discussionId)
-###### 30. getDiscussion(string discussionId)
-###### 31. setDiscussionName(string discussionId,string name)
-###### 32. setDiscussionInviteStatus(string discussionId,number status)
+
+*  getConversation(string type,string targetId)
+*  getConversationList()
+*  getLatestMessages(string type,string targetId,number count)
+*  removeConversation(string type,string targetId)
+*  insertMessage(string type,string targetId,string senderId,object content)
+*  clearMessageUnreadStatus(string type,string targetId)
+*  startRecordVoice()
+*  cancelRecordVoice()
+*  finishRecordVoice()
+*  startPlayVoice()
+*  stopPlayVoice()
+*  getConversationNotificationStatus(string type,string targetId)
+*  setConversationNotificationStatus(string type,string targetId,boolean isBlock)
+*  clearMessages(string type,string targetId)
+*  deleteMessagesByTarget(string type,string targetId)
+*  deleteMessagesByMsgIds(array targetIds)
+*  getRemoteHistoryMessages(string type,string targetId,number dateTime,number count)
+*  saveTextMessageDraft(string type,string targetId,string content)
+*  getTextMessageDraft(string type,string targetId)
+*  addToBlacklist(string userId)
+*  removeFromBlacklist(string userId)
+*  getBlacklist()
+*  createDiscussion(string name,array userIdLists)
+*  addMemberToDiscussion(string discussionId,array userIdList)
+*  removeMemberFromDiscussion(string discussionId,string userId)
+*  quitDiscussion(string discussionId)
+*  getDiscussion(string discussionId)
+*  setDiscussionName(string discussionId,string name)
+*  setDiscussionInviteStatus(string discussionId,number status)
+
 
 
 
 sendCustomizeMessage已实现demo，具体用到的话根据需要更改方法，调整参数
 
+
+
+
+
+    
