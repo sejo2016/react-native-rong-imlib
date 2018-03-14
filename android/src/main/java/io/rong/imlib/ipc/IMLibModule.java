@@ -22,6 +22,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
@@ -35,10 +36,17 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import io.rong.common.RLog;
+import io.rong.imlib.AnnotationNotFoundException;
+import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Discussion;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
+import io.rong.imlib.model.UserInfo;
+import io.rong.message.RecallNotificationMessage;
+import okhttp3.internal.Util;
 
 /**
  * Created by tdzl2003 on 3/31/16.
@@ -55,6 +63,11 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
         if (!isIMClientInited) {
             isIMClientInited = true;
             RongIMClient.init(reactContext.getApplicationContext());
+            try {
+                RongIMClient.registerMessageType(CustomizeMessage.class);
+            } catch (AnnotationNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         reactContext.addLifecycleEventListener(this);
@@ -157,6 +170,25 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
     }
 
     @ReactMethod
+    public void getConversation(final String type, final String targetId, final Promise promise){
+        if (client == null) {
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.getConversation(Conversation.ConversationType.valueOf(type.toUpperCase()), targetId, new RongIMClient.ResultCallback<Conversation>() {
+            @Override
+            public void onSuccess(Conversation conversation) {
+                promise.resolve(conversation);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject("" + errorCode.getValue(), errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
     public void getConversationList(final Promise promise){
         if (client == null) {
             promise.reject("NotLogined", "Must call connect first.");
@@ -218,7 +250,7 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
     }
 
     @ReactMethod
-    public void removeConversation(final String type, final String targetId, final Promise promise) {
+        public void removeConversation(final String type, final String targetId, final Promise promise) {
         if (client == null) {
             promise.reject("NotLogined", "Must call connect first.");
             return;
@@ -242,7 +274,7 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
             promise.reject("NotLogined", "Must call connect first.");
             return;
         }
-        if ("image".equals(map.getString("type"))) {
+        /*if ("image".equals(map.getString("type"))) {
             Utils.getImage(Uri.parse(map.getString("imageUrl")), null, new Utils.ImageCallback(){
 
                 @Override
@@ -287,7 +319,7 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
                 }
             });
             return;
-        }
+        }*/
         client.sendMessage(Conversation.ConversationType.valueOf(type.toUpperCase()), targetId, Utils.convertToMessageContent(map), pushContent, pushData, new RongIMClient.SendMessageCallback() {
             @Override
             public void onError(Integer messageId, RongIMClient.ErrorCode e) {
@@ -315,6 +347,44 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
                 promise.resolve(Utils.convertMessage(message));
             }
 
+        });
+    }
+
+    /**
+     * 自定义消息，根据需求更改参数等内容
+     * @param type
+     * @param targetId
+     * @param pushContent
+     * @param pushData
+     * @param customizeId
+     * @param extra
+     * @param promise
+     */
+    @ReactMethod
+    public void sendCustomizeMessage(String type, String targetId, String pushContent, String pushData, String customizeId, String extra, final Promise promise){
+        if (client == null) {
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+
+        CustomizeMessage customizeMessage = CustomizeMessage.obtain(customizeId,"gift","http://www.baidu.com",extra);
+
+        RongIMClient.getInstance().sendMessage(Conversation.ConversationType.valueOf(type.toUpperCase()), targetId, customizeMessage, pushContent, pushData, new IRongCallback.ISendMessageCallback() {
+            @Override
+            public void onAttached(Message message) {
+
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                RLog.e("++++customizeMessage++++:", String.valueOf(Utils.convertMessage(message)));
+                promise.resolve(Utils.convertMessage(message));
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                promise.reject("" + errorCode.getValue(), errorCode.getMessage());
+            }
         });
     }
 
@@ -554,6 +624,327 @@ public class IMLibModule extends ReactContextBaseJavaModule implements RongIMCli
                     }
                 });
     }
+
+    @ReactMethod
+    public void deleteMessagesByTarget(String type, String targetId, final Promise promise){
+        client.deleteMessages(Conversation.ConversationType.valueOf(type.toUpperCase()), targetId, new RongIMClient.ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean aBoolean) {
+                promise.resolve(aBoolean);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void deleteMessagesByMsgIds(ReadableArray targetId, final Promise promise){
+        client.deleteMessages(Utils.convertToIntArray(targetId), new RongIMClient.ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean aBoolean) {
+                promise.resolve(aBoolean);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getRemoteHistoryMessages(String type,String targetId,Integer dateTime,Integer count,final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+
+        client.getRemoteHistoryMessages(Conversation.ConversationType.valueOf(type.toUpperCase()),targetId,dateTime,count, new RongIMClient.ResultCallback<List<Message>>() {
+            @Override
+            public void onSuccess(List<Message> messages) {
+                promise.resolve(Utils.convertMessageList(messages));
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+
+    }
+
+    @ReactMethod
+    public void saveTextMessageDraft(String type, String targetId, final String content, final Promise promise){
+        client.saveTextMessageDraft(Conversation.ConversationType.valueOf(type.toUpperCase()), targetId, content, new RongIMClient.ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean aBoolean) {
+                promise.resolve(aBoolean);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getTextMessageDraft(final String type,final String targetId, final Promise promise){
+        client.getTextMessageDraft(Conversation.ConversationType.valueOf(type.toUpperCase()), targetId, new RongIMClient.ResultCallback<String>() {
+            @Override
+            public void onSuccess(String s) {
+                promise.resolve(s);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void setConversationToTop(final String type, final String id, final boolean isTop, final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.setConversationToTop(Conversation.ConversationType.valueOf(type.toUpperCase()), id, isTop, new RongIMClient.ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean aBoolean) {
+                promise.resolve(aBoolean);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void addToBlacklist(String userId, final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+
+        client.addToBlacklist(userId, new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("add to black list successfully");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void removeFromBlacklist(String userId, final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.removeFromBlacklist(userId, new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("removed from black list successfully");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getBlacklist(final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.getBlacklist(new RongIMClient.GetBlacklistCallback() {
+            @Override
+            public void onSuccess(String[] strings) {
+                promise.resolve(strings);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void createDiscussion(final String name, final ReadableArray userIdList, final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.createDiscussion(name, Utils.converToStringList(userIdList), new RongIMClient.CreateDiscussionCallback() {
+            @Override
+            public void onSuccess(String s) {
+                promise.resolve(s);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void addMemberToDiscussion(final String discussionId, final ReadableArray userIdList,final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.addMemberToDiscussion(discussionId, Utils.converToStringList(userIdList), new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("add member to discussion successful");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void removeMemberFromDiscussion(final String discussionId,final String userId,final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.removeMemberFromDiscussion(discussionId, userId, new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("remove member to discussion successful");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void quitDiscussion(final String discussionId,final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.quitDiscussion(discussionId, new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("quit discussion successful");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getDiscussion(final String discussionId,final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+
+        client.getDiscussion(discussionId, new RongIMClient.ResultCallback<Discussion>() {
+            @Override
+            public void onSuccess(Discussion discussion) {
+                promise.resolve(discussion);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void setDiscussionName(final String discussionId, final String name,final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.setDiscussionName(discussionId, name, new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("set discussion name successful");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void setDiscussionInviteStatus(final String discussionId, final Integer status, final Promise promise){
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+        client.setDiscussionInviteStatus(discussionId, RongIMClient.DiscussionInviteStatus.setValue(status), new RongIMClient.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                promise.resolve("set discussion invite status successful");
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void recallMessage(final Integer messageId,final Promise promise){
+
+        if (client == null){
+            promise.reject("NotLogined", "Must call connect first.");
+            return;
+        }
+
+        Message message = new Message();
+        message.setMessageId(messageId);
+
+        client.recallMessage(message, new RongIMClient.ResultCallback<RecallNotificationMessage>() {
+            @Override
+            public void onSuccess(RecallNotificationMessage recallNotificationMessage) {
+                WritableMap writableMap = Arguments.createMap();
+                writableMap.putString("operatorId",recallNotificationMessage.getOperatorId());
+                writableMap.putInt("recallTime", (int) recallNotificationMessage.getRecallTime());
+                writableMap.putString("originalObjectName",recallNotificationMessage.getOriginalObjectName());
+                sendDeviceEvent("recallListener",writableMap);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                promise.reject(""+errorCode.getValue(),errorCode.getMessage());
+            }
+        });
+    }
+
 
     @Override
     public void onChanged(ConnectionStatus connectionStatus) {
